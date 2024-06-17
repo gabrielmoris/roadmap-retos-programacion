@@ -1,9 +1,26 @@
 fn main() {
-    let json1 = json_creator("gab", r#"{"name":"gabrielcmoris","age":34, "date_of_birth":"17.09.1989", "list_of_programming_languages":["javascript", "typescript","php","rust"]}"#);
-    let json2 = create_json_file(
-        "gabrielcmoris",
-        r#"{"name":"gabrielcmoris","age":34, "date_of_birth":"17.09.1989", "list_of_programming_languages":["javascript", "typescript","php","rust"]}"#,
-    );
+    let json_data = r#"{
+        "name":"gabrielcmoris",
+        "age":34, 
+        "date_of_birth":"17.09.1989", 
+        "list_of_programming_languages": ["javascript", "typescript","php","rust"]
+    }"#;
+
+    let xml_data = r#"<person name="gabrielcmoris">
+    <details>
+      <age>34</age>
+      <date_of_birth>17.09.1989</date_of_birth>
+      <languages>
+        <language name="javascript">javascript</language>
+        <language name="typescript">typescript</language>
+        <language name="php">php</language>
+        <language name="rust">rust</language>
+      </languages>
+    </details>
+  </person>"#;
+
+    let json1 = file_creator("gab", json_data, "json");
+    let json2 = create_json_file("gabrielcmoris", json_data);
 
     match json1 {
         Ok(_) => println!("File .json created successfully"),
@@ -11,6 +28,12 @@ fn main() {
     }
     match json2 {
         Ok(_) => println!("File .json created successfully"),
+        Err(err) => println!("Error creating file: {}", err),
+    }
+
+    let xml1 = file_creator("gab", xml_data, "xml");
+    match xml1 {
+        Ok(_) => println!("File .xml created successfully"),
         Err(err) => println!("Error creating file: {}", err),
     }
 }
@@ -30,11 +53,11 @@ fn main() {
 */
 
 use std::fs::{File, OpenOptions};
-use std::io::{self, Error, ErrorKind, Read, Write};
-//············ JSON ············
+use std::io::{Error, ErrorKind, Write};
 
-fn json_creator(file: &str, file_content: &str) -> Result<(), Error> {
-    let file_name = format!("{}.json", file);
+// BOTH XML and JSON
+fn file_creator(file: &str, file_content: &str, extension: &str) -> Result<(), Error> {
+    let file_name = format!("{}.{}", file, extension);
     let copied_file_name = file_name.clone();
 
     if !file_name.is_empty() {
@@ -55,6 +78,8 @@ fn json_creator(file: &str, file_content: &str) -> Result<(), Error> {
     }
 }
 
+//············ JSON ············
+
 // This is a easier approach with a module
 use serde_json::{to_string_pretty, Value};
 
@@ -67,13 +92,6 @@ fn create_json_file(filename: &str, file_content: &str) -> Result<(), Error> {
     file.write_all(pretty_json.to_string().as_bytes())?; // Write serialized JSON
     Ok(())
 }
-
-//············ XML  ············
-
-
-
-
-
 
 /* EXTRA DIFFICULTY (optional):
 * Using the logic of creating the previous files, create a
